@@ -1,0 +1,141 @@
+# Guia de Estudo: Azure Monitor para o Exame AZ-104
+
+Este material tem como objetivo ajudar candidatos na preparação para o **Exame AZ-104: Microsoft Azure Administrator**, explorando os principais conceitos e práticas relacionados ao **Azure Monitor**, ferramenta essencial para o monitoramento de recursos na nuvem. O conteúdo abrange desde a criação e configuração até a análise de métricas e logs, alertas e dicas específicas para o exame.
+
+## 1. Visão Geral do Azure Monitor
+
+O **Azure Monitor** é uma plataforma centralizada para coleta, análise e resposta a dados de telemetria de ambientes no Azure e em infraestruturas híbridas. Por ser indispensável para o AZ-104, é fundamental compreender como ele auxilia na análise de desempenho, diagnóstico de falhas e configuração de alertas.
+
+### Conceitos Fundamentais
+- **Métricas**: Valores numéricos em tempo real (ex.: CPU, memória), retidos por 93 dias.
+- **Logs**: Registros detalhados de eventos, armazenados em workspaces do Log Analytics.
+- **Alertas**: Notificações acionadas por condições baseadas em métricas ou logs.
+- **Application Insights**: Monitoramento de aplicações com foco em performance e experiência do usuário.
+- **Log Analytics**: Plataforma para consultas baseadas em Kusto Query Language (KQL).
+- **Workbooks**: Dashboards interativos para análise visual dos dados.
+
+**Dica de prova**: Domine a distinção entre métricas (dados numéricos, tempo real) e logs (eventos detalhados, históricos).
+
+## 2. Etapas para Configurar o Azure Monitor
+
+### Passo a Passo
+1. **Acesse o Azure Monitor**:
+   - No portal do Azure, clique em "Monitor" para visualizar métricas, logs e alertas.
+2. **Crie um Workspace do Log Analytics**:
+   - Vá até "Log Analytics Workspaces" > Criar.
+   - Selecione a assinatura, grupo de recursos, nome e localização.
+3. **Configure a Coleta de Dados**:
+   - Implante o **Azure Monitor Agent** em VMs ou servidores.
+   - Utilize as **Data Collection Rules (DCR)** para definir os dados a serem coletados (ex.: logs de sistema, contadores de desempenho).
+4. **Ajuste as Configurações de Diagnóstico**:
+   - Encaminhe logs e métricas de recursos como VMs ou contas de armazenamento para o Log Analytics.
+5. **Visualize os Dados**:
+   - Utilize dashboards personalizados ou **Workbooks** para análise interativa.
+
+### Considerações de Rede
+- **Conectividade**: O agente precisa acessar a internet ou endpoints do Azure.
+- **Segurança**: Gerencie acessos ao workspace com RBAC (controle baseado em função).
+
+**Dica de prova**: Saiba criar e vincular um Log Analytics Workspace a recursos específicos.
+
+## 3. Trabalhando com Métricas
+
+### Características Principais
+- **Retenção**: 93 dias.
+- **Detalhamento**: Coletas a cada minuto, podendo ser menor, conforme o recurso.
+- **Exemplos**:
+  - Uso de CPU de VMs.
+  - Tempo de resposta de aplicações.
+  - Taxa de IOPS em discos.
+
+### Atividades Comuns
+- **Acessar Métricas**:
+  - Vá até o recurso > “Monitoramento” > “Métricas”.
+  - Use o **Metrics Explorer** para visualizar gráficos personalizados.
+- **Filtro e Agrupamento**:
+  - Filtre por recurso, namespace ou período.
+  - Agrupe por dimensões (ex.: por VM em determinado grupo).
+
+**Dica de prova**: Experimente criar visualizações no Metrics Explorer e conheça a estrutura dos namespaces de métricas.
+
+## 4. Logs e Análises com Log Analytics
+
+### Sobre o Log Analytics
+- **Definição**: Serviço para armazenamento e consulta de logs com KQL.
+- **Exemplo de Consulta**:
+  ```kql
+  AzureMetrics
+  | where ResourceName == "myVM"
+  | where MetricName == "Percentage CPU"
+  | summarize avg(Value) by bin(TimeGenerated, 1h)
+  ```
+- **Aplicações**: Investigação de falhas, auditoria, análise de tendências.
+
+### Como Configurar
+- Crie um workspace.
+- Conecte recursos via Diagnostic Settings ou agentes.
+- Adicione extensões para coletar logs específicos (ex.: IIS, eventos do Windows).
+
+**Dica de prova**: Pratique consultas com KQL e configure o Diagnostic Settings em diferentes recursos.
+
+## 5. Criando Alertas
+
+### Tipos de Alertas
+- **De Métrica**: Baseado em limites numéricos (ex.: CPU > 80%).
+- **De Log**: Baseado em resultados de KQL.
+- **De Atividade**: Baseado em eventos do Azure (ex.: criação de recursos).
+
+### Como Criar um Alerta
+1. No portal: "Monitor" > "Alertas" > "Nova regra de alerta".
+2. **Escopo**: Escolha o recurso a ser monitorado.
+3. **Condição**: Configure o limiar ou consulta KQL.
+4. **Ação**: Crie um **Action Group** para envio de notificações ou ações automatizadas.
+5. **Detalhamento**: Defina nome, nível de severidade (0 a 4) e descrição.
+
+**Dica de prova**: Saiba como vincular alertas a Action Groups e diferenciar níveis de severidade.
+
+## 6. Application Insights para Aplicações
+
+### Recursos
+- Acompanha desempenho, falhas e uso de aplicações.
+- Captura tempos de resposta, taxas de erro e chamadas externas.
+
+### Configuração
+- Crie o recurso no portal.
+- Integre via SDK ou ative o monitoramento automático.
+- Use painéis para visualização detalhada.
+
+**Dica de prova**: Lembre-se de que o Application Insights é voltado para apps, enquanto o Azure Monitor monitora a infraestrutura.
+
+## 7. Atividades Práticas para o Exame
+
+### Comandos Úteis no Azure CLI
+```bash
+# Criar workspace do Log Analytics
+az monitor log-analytics workspace create --resource-group <nome-grupo> --workspace-name <nome-workspace> --location <regiao>
+
+# Listar métricas
+az monitor metrics list --resource <id-recurso> --metric "Percentage CPU" --interval PT1H
+
+# Criar alerta por métrica
+az monitor metrics alert create --name <nome-alerta> --resource-group <nome-grupo> --condition "avg Percentage CPU > 80" --scopes <id-recurso> --action <id-action-group>
+```
+
+### Ações no Portal
+- **Painéis**: Adicione métricas e resultados de consultas.
+- **Alertas**: Configure para detectar problemas com antecedência.
+- **Consultas KQL**: Explore os dados usando o Log Analytics.
+
+## 8. Dicas Essenciais para o AZ-104
+- **Pratique KQL**: Aprenda a usar comandos básicos de filtragem e agregação.
+- **Domine Alertas**: Criação, escopo, condições, ações e severidade.
+- **Logs vs. Métricas**: Compreenda as diferenças e quando usar cada um.
+- **Cenários Comuns**: Ex.: identificar uso elevado de CPU, configurar alerta para falha de serviço.
+- **Prática no Portal**: Use uma sandbox ou conta gratuita para explorar o Azure Monitor.
+
+## 9. Recursos Extras
+- **Microsoft Learn**: Cursos gratuitos para a certificação AZ-104.
+- **Documentação Oficial**: Explore o conteúdo do Azure Monitor.
+- **Laboratórios Interativos**: Treine com ambientes reais via Qwiklabs ou sandbox do Azure.
+
+**Última dica**: Familiarize-se com a interface do portal Azure e concentre-se em situações práticas de monitoramento e diagnóstico usando métricas, logs e alertas.
